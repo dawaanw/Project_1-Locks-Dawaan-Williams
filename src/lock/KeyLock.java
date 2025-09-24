@@ -40,8 +40,8 @@ public class KeyLock implements Lock {
 
 	@Override
 	public boolean lock() {
-		if (this.isInserted && !this.isLocked) {
-			this.isLocked = true;
+		if (this.isInserted && !this.isLocked) { // if the key is inserted and its unlocked
+			this.isLocked = true; // locks the lock
 			return true;
 		}
 		return false;
@@ -49,8 +49,8 @@ public class KeyLock implements Lock {
 
 	@Override
 	public boolean unlock() {
-		if (this.isInserted && this.isLocked) {
-			this.isLocked = false;
+		if (this.isInserted && this.isLocked) { // if the key is inserted and the lock is locked
+			this.isLocked = false; // unlocks the lock
 			return true;
 		}
 		return false;
@@ -58,7 +58,6 @@ public class KeyLock implements Lock {
 
 	@Override
 	public boolean isLocked() {
-		// TODO Auto-generated method stub
 		return this.isLocked;
 	}
 }
