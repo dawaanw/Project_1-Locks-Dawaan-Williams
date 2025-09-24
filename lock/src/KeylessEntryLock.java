@@ -1,6 +1,6 @@
 package lock;
 
-public class KeylessEntryLock extends KeyLock {
+public class KeylessEntryLock extends KeyLock implements Lock {
 
 	public static final int MAX_NUM_USER_CODES = 10;
 	public static final int USER_CODE_LENGTH = 4;
