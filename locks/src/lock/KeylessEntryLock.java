@@ -58,9 +58,13 @@ public class KeylessEntryLock extends KeyLock {
 	    }
 
 	    private void resetBuffer() {
-	        Arrays.fill(buffer, 0);
+	        if (bufferIndex > 0) {
+	        	attempt = Arrays.copyOf(buffer, bufferIndex);
+	        }
+	    	Arrays.fill(buffer, 0);
 	        bufferIndex = 0;
 	        tempIndex = 0;
+	        isReset = true;
 	    }
 
 	    private boolean addUserCode(int[] code) {
@@ -105,13 +109,14 @@ public class KeylessEntryLock extends KeyLock {
 	                    currentState = State.ENTER_MASTER;
 	                    return true;
 	                }
+	                
 	            } else if (currentState == State.ENTER_NEW_USER || currentState == State.CONFIRM_NEW_USER
 	                    || currentState == State.ENTER_USER_TO_DELETE || currentState == State.CONFIRM_DELETE_USER
 	                    || currentState == State.ENTER_NEW_MASTER || currentState == State.CONFIRM_NEW_MASTER) {
 	                if (tempIndex < USER_CODE_LENGTH) {
 	                    tempUserCode[tempIndex++] = digit;
 	                    return true;
-	                } else if (tempIndex < MASTER_CODE_LENGTH) { // for new master
+	                } else if (tempIndex < MASTER_CODE_LENGTH) { 
 	                    tempUserCode[tempIndex++] = digit;
 	                    return true;
 	                }
@@ -119,9 +124,23 @@ public class KeylessEntryLock extends KeyLock {
 	            return false;
 	        }
 
-	        // '*' triggers next stage
 	        if (button == '*') {
 	            switch (currentState) {
+	            	case IDLE:
+	            		if (bufferIndex == USER_CODE_LENGTH && checkUserCode(buffer)) {
+	            			if (super.isLocked()) {
+	            				super.unlock();
+	            			}
+	            			resetBuffer();
+	            			return true;
+	            		}
+	            		  if (bufferIndex == MASTER_CODE_LENGTH && checkMasterCode(buffer)) {
+	                          bufferIndex = 0;
+	                          currentState = State.SELECT_OP;
+	                          return true;
+	                      }
+	                      resetBuffer();
+	                      return false;
 	                case ENTER_MASTER:
 	                    if (bufferIndex == MASTER_CODE_LENGTH && checkMasterCode(buffer)) {
 	                        bufferIndex = 0;
@@ -222,6 +241,15 @@ public class KeylessEntryLock extends KeyLock {
 
 	public int[] getMasterCode() {
 		return masterCode.clone();
+	}
+	public int[] getLastAttempt() {
+	    return attempt.clone();
+	}
+
+	public boolean wasReset() {
+	    boolean result = isReset;
+	    isReset = false; // clear after reading
+	    return result;
 	}
 
 }
