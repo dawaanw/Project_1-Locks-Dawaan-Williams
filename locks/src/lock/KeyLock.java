@@ -10,7 +10,9 @@ public class KeyLock implements Lock {
 		this.isLocked = true; // locked by default
 		this.isInserted = false; // no key inserted initially
 	}
-	
+	public boolean isInserted() {
+		return this.isInserted;
+	}
 	public boolean insertKey(int key) {
 		if (this.isInserted) {
 			return false; // a key is already inserted
